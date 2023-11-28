@@ -3,9 +3,9 @@ kind: Service
 metadata:
     name: liatrio-exercise-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
-  - name: http
+  - portocol: TCP
     port: 80
     targetPort: 8080
   selector:

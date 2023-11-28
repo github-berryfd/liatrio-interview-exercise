@@ -24,3 +24,9 @@ docker tag liatrio-webservice berryfd/liatrio-webserivce:0.1.0
 
 kubectl apply -f .\deployment\kube\deployment.yaml
 /health
+
+
+CLOUD RESOURCE API
+
+
+Git push -> Git workflow -> (C: Terraform VPC) -> (C: Terraform GKE (module))  -> (C: Artifactroy upload and deploy)
