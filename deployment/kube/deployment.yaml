@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: liatrio-exercise
+  labels:
+    app: liatrio-service
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            app: liatrio-service
+    template:
+        metadata:
+            labels:
+                app: liatrio-service
+        spec:
+            containers:
+            - name: liatrio-webservice
+              image: berryfd/liatrio-webservice:0.1.0
+              imagePullPolicy: IfNotPresent
+              ports:
+              - containerPort: 8080
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 15
+                timeoutSeconds: 5
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                timeoutSeconds: 1
+#No resourcse limits --
+#securityContext
+#serviceaccountname (for external requests)

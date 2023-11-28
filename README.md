@@ -16,5 +16,17 @@ https://github.com/golang-standards/project-layout
 Project 
 https://travisjeffery.com/b/2019/11/i-ll-take-pkg-over-internal/
 ## Deployment Instructions
+docker build -t liatrio-exercise -f .\deployment\docker\Dockerfile .
 
+docker push berryfd/liatrio-webservice:0.1.0
+
+docker tag liatrio-webservice berryfd/liatrio-webserivce:0.1.0
+
+kubectl apply -f .\deployment\kube\deployment.yaml
 /health
+
+
+CLOUD RESOURCE API
+
+
+Git push -> Git workflow -> (C: Terraform VPC) -> (C: Terraform GKE (module))  -> (C: Artifactroy upload and deploy)
