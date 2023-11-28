@@ -1,0 +1,64 @@
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/vendor/
+/Godeps/
+*.test
+*.out
+
+# Kubernetes
+*.yaml
+*.yml
+# Exclude specific YAML configs that should be version controlled
+!*.base.yaml
+!*.base.yml
+
+# Terraform
+*.tfstate
+*.tfstate.*.backup
+*.tfstate.backup
+*.tfvars
+.terraform/
+# Exclude .tf and .tf.json files
+!*.tf
+!*.tf.json
+
+# Docker
+*.log
+docker-compose.override.yml
+**/Dockerfile
+**/docker-compose*.yml
+**/.env
+**/.dockerignore
+# Ignore Docker volumes by default
+**/volumes/
+# Exclude specific Dockerfile and docker-compose files that should be version controlled
+!**/Dockerfile.*
+!**/docker-compose.*.yml
+
+# General
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+*.tar
+*.zip
+*.bz2
+*.swp
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs and editors
+.idea/
+*.iml
+.vscode/
+*.sublime-project
+*.sublime-workspace
