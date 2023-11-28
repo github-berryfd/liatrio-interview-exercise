@@ -31,5 +31,33 @@ module "gke" {
   http_load_balancing        = false
   network_policy             = false
   horizontal_pod_autoscaling = true
+  node_pools = [
+    {
+      name = "liatrio-gke-node-pool"
+      min_count = 1
+      max_count = 2
+      machine_type = "e2-small"
+      initial_node_count = 1
+      disk_size_gb = 10
+    }
+  ]
+
+  node_pools_oauth_scopes = {
+    all = [
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+    ]
+  }
+  node_pools_metadata = {
+    liatrio-gke-node-pool = {
+      shutdown-script = "kubectl --kubeconfig=/var/lib/kubelet/kubeconfig drain --force=true --ignore-daemonsets=true --delete-local-data \"$HOSTNAME\""
+    }
+  }
+  node_pools_labels = {
+    all = {}
+    pool-01 = {
+      liatrio-pool-1 = true
+    }
+  }
 }
 
