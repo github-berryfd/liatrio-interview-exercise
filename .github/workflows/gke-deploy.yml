@@ -54,7 +54,6 @@ jobs:
 
     permissions:
       contents: 'read'
-      id-token: 'write'
 
     steps:
       # Checkout the repository to the GitHub Actions runner
