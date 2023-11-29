@@ -22,6 +22,6 @@ jobs:
       gke_cluster: "liatrio-gke-cluster"
       gke_region: "us-central1"
       deployment_name: ""
-      dockerfile_path: "./deployment/dockerfile/Dockerfile"
+      dockerfile_path: "./deployment/docker/Dockerfile"
       image_tag: "berryfd/berryfd/liatrio-webservice:latest"
     secrets: inherit
