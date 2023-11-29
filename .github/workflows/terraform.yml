@@ -57,6 +57,7 @@ on:
       region:
         required: true
         type: string
+        default: 'us-central1'
       network:
         required: false
         default: 'terraformed-vpc-01'
