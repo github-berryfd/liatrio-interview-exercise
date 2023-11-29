@@ -70,11 +70,11 @@ jobs:
           create_credentials_file: true
           export_environment_variables: true
 
-      - name: Set up GKE credentials
-        uses: google-github-actions/get-gke-credentials@v1
-        with:
-          cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GKE_REGION }}
+      # - name: Set up GKE credentials
+      #   uses: google-github-actions/get-gke-credentials@v1
+      #   with:
+      #     cluster_name: ${{ env.GKE_CLUSTER }}
+      #     location: ${{ env.GKE_REGION }}
       
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
