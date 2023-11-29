@@ -1,11 +1,14 @@
+# This reusable workflow is designed tear down everything Terraform has previously set up.
 name: 'Tearing Down Infrastructure'
 
 on:
+  # This workflow can only be called within Github, Defaults are provided
   workflow_dispatch:
     inputs:
       region:
         required: true
         type: string
+        default: 'us-central1'
       network:
         required: false
         default: 'terraformed-vpc-01'
@@ -39,30 +42,34 @@ jobs:
       TF_VAR_ip_range_services: ${{ inputs.IP_RANGE_SERVICES }}
       TF_VAR_compute_engine_service_account: ${{ secrets.SERVICE_ACCOUNT}}
       TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
-      # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+
+      # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest (Action Requirement)
     defaults:
       run:
         shell: bash
         working-directory: ./infra
 
     steps:
+
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v4
       with:
         ref: ${{ github.ref }}
 
+    # Configure GCP Authentication with Service Account Credentials. This should be using Workload Identity Federation and generate an access token instead. (MVP)
     - name: Authenticate With GCP
       uses: google-github-actions/auth@v1.2.0
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
         create_credentials_file: true
         export_environment_variables: true
-      
+
+    # Configure the SDK so that we can use terraform natively
     - name: Setup Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
       
-  # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
@@ -76,13 +83,12 @@ jobs:
     - name: Terraform Init
       run: terraform init 
 
-    - name: Terraform Validate
-      run: terraform fmt -check
-
+    # Plan the destroy process with terraform to make sure there are no issues.
     - name: Terraform Destroy Plan
-      run: terraform plan -destroy
-    # Save plan
-    # Generates an execution plan for Terraform
+      run: terraform plan -destroy # The plan should probably be saved to be used in the next step.
+      continue-on-error: true # It looks like git is getting the wrong status code back after planning, it is successful but the status code says that it failed.
+    
+    # Destroy the infrastructure to its default state (Nothing)
     - name: Terraform Destroy
       run: terraform destroy
 

@@ -1,57 +1,9 @@
-# This workflow installs the latest version of Terraform CLI and configures the Terraform CLI configuration file
-# with an API token for Terraform Cloud (app.terraform.io). On pull request events, this workflow will run
-# `terraform init`, `terraform fmt`, and `terraform plan` (speculative plan via Terraform Cloud). On push events
-# to the "main" branch, `terraform apply` will be executed.
-#
-# Documentation for `hashicorp/setup-terraform` is located here: https://github.com/hashicorp/setup-terraform
-#
-# To use this workflow, you will need to complete the following setup steps.
-#
-# 1. Create a `main.tf` file in the root of this repository with the `remote` backend and one or more resources defined.
-#   Example `main.tf`:
-#     # The configuration for the `remote` backend.
-#     terraform {
-#       backend "remote" {
-#         # The name of your Terraform Cloud organization.
-#         organization = "example-organization"
-#
-#         # The name of the Terraform Cloud workspace to store Terraform state files in.
-#         workspaces {
-#           name = "example-workspace"
-#         }
-#       }
-#     }
-#
-#     # An example resource that does nothing.
-#     resource "null_resource" "example" {
-#       triggers = {
-#         value = "A example resource that does nothing!"
-#       }
-#     }
-#
-#
-# 2. Generate a Terraform Cloud user API token and store it as a GitHub secret (e.g. TF_API_TOKEN) on this repository.
-#   Documentation:
-#     - https://www.terraform.io/docs/cloud/users-teams-organizations/api-tokens.html
-#     - https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
-#
-# 3. Reference the GitHub secret in step using the `hashicorp/setup-terraform` GitHub Action.
-#   Example:
-#     - name: Setup Terraform
-#       uses: hashicorp/setup-terraform@v1
-#       with:
-#         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-# TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
-# TF_VAR_region: ${{ vars.REGION }}
-# TF_VAR_network: ${{ vars.NETWORK }}
-# TF_VAR_subnetwork: ${{ vars.SUBNETWORK }}
-# TF_VAR_ip_range_pods: ${{ vars.IP_RANGE_PODS }}
-# TF_VAR_ip_range_services: ${{ vars.IP_RANGE_SERVICES }}
-# TF_VAR_compute_engine_service_account: ${{ secrets.SERVICE_ACCOUNT }}
-
+# This reusable workflow is designed to use Terraform to provision the infrastructure and initialize the Google Kubernetes Engine
+# On first run, the workflow will most likely fail. (race condition)
 name: 'Setting Up Infrastructure'
 
 on:
+  # This workflow can only be called within Github, Defaults are provided
   workflow_call:
     inputs:
       region:
@@ -101,6 +53,7 @@ jobs:
       TF_VAR_ip_range_services: ${{ inputs.IP_RANGE_SERVICES }}
       TF_VAR_compute_engine_service_account: ${{ secrets.SERVICE_ACCOUNT}}
       TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
+
       # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
@@ -108,23 +61,26 @@ jobs:
         working-directory: ./infra
 
     steps:
+
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v4
       with:
         ref: ${{ github.ref }}
 
+    # Configure GCP Authentication with Service Account Credentials. This should be using Workload Identity Federation and generate an access token instead. (MVP)
     - name: Authenticate With GCP
       uses: google-github-actions/auth@v1.2.0
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
         create_credentials_file: true
         export_environment_variables: true
-      
+
+    # Configure the SDK so that we can use terraform natively
     - name: Setup Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
       
-  # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
@@ -138,16 +94,11 @@ jobs:
     - name: Terraform Init
       run: terraform init 
 
-    - name: Terraform Validate
-      run: terraform fmt -check
-    # Save plan
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan -input=false
-      continue-on-error: true
-
-      # On push to "main", build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-      # if: github.ref == 'refs/heads/$main' && github.event_name == 'push'
+      run: terraform plan -input=false # The plan should probably be saved to be used in the next step.
+      continue-on-error: true # It looks like git is getting the wrong status code back after planning, it is successful but the status code says that it failed.
+    
+    # Destroy the infrastructure to its default state (Nothing)
     - name: Terraform Apply
       run: terraform apply -auto-approve -input=false

@@ -1,3 +1,5 @@
+# This service requires the endpoints compute.googapis.com and container.googleapis.com
+# If the API is not activated in GCP then it will throw an error.
 resource "google_project_service" "compute" {
   service                    = "compute.googleapis.com"
   disable_dependent_services = true
@@ -9,7 +11,7 @@ resource "google_project_service" "container" {
   disable_dependent_services = true
   disable_on_destroy         = false
 }
-
+# The VPC is dependent on the APIs.
 resource "google_compute_network" "liatrio-vpc" {
   name                            = var.network
   routing_mode                    = "REGIONAL" #OR GLOBAL

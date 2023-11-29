@@ -1,3 +1,4 @@
+# Required versions for terrafform and google.
 terraform {
   backend "gcs" {
     bucket = "liatrio-tf-state"
