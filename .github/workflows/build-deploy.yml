@@ -13,8 +13,8 @@ jobs:
       network: "liatrio-vpc"
       subnetwork: "liatrio-vpc-subnet-"
       ip_range_pods: "liatrio-vip-subnet-pods"
-      ip_range_services: "liatrio-vip-subnet-services"
-    secrets: inherit
+      ip_range_services: "liatrio-vip-dsubnet-services"
+    secrets: inherit 
   # Coming soon
   #  deploy: 
   #   needs: [ standup ]
