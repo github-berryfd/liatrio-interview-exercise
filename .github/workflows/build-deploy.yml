@@ -21,15 +21,16 @@ jobs:
     uses: ./.github/workflows/docker-publish.yml
     with:
       dockerfile_path: "./deployment/docker/Dockerfile"
-      image_tag: "berryfd/berryfd/liatrio-webservice:latest"
+      image_tag: "berryfd/liatrio-webservice:latest"
     secrets: inherit
 
   deploy:
     needs: [ terraform, docker-build-publish ] 
     name: Call GKE Deployment Workflow
     uses: ./.github/workflows/gke-deploy.yml
+    secrets: inherit
     with:
+      kube_context: "./deployment/kube/"
       gke_cluster: "liatrio-gke-cluster"
       gke_region: "us-central1"
-      deployment_name: ""
-    secrets: inherit
+    
