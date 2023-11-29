@@ -15,13 +15,13 @@ name: Build and Deploy to GKE
 on:
   workflow_call:
     inputs:
+      kube_context:
+        required: true
+        type: string
       gke_cluster:
         required: true
         type: string
       gke_region:
-        required: true
-        type: string
-      deployment_name:
         required: true
         type: string
     secrets:
@@ -33,7 +33,7 @@ on:
 env:
   GKE_CLUSTER: ${{ inputs.gke_cluster }}   
   GKE_REGION: ${{ inputs.gke_region }}   
-  DEPLOYMENT_NAME: ${{ inputs.deployment_name }} 
+  KUBE_CONTEXT: ${{ inputs.kube-context }}
 
 jobs:
   build-publish:
@@ -64,22 +64,6 @@ jobs:
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_REGION }}
-      
 
-      # # Push the Docker image to Google Artifact Registry
-      # - name: Publish
-      #   run: |-
-      #     docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
-      # # Set up kustomize
-      # # - name: Set up Kustomize
-      # #   run: |-
-      # #     curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
-      # #     chmod u+x ./kustomize
-      # # Deploy the Docker image to the GKE cluster
-      # - name: Deploy
-      #   run: |-
-      #     # replacing the image name in the k8s template
-      #     # ./kustomize edit set image LOkON-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG=$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA
-      #     # ./kustomize build . | kubectl apply -f -
-      #     kubectl rollout status deployment/$DEPLOYMENT_NAME
-      #     kubectl get services -o wide
+      - name: "Deploy to GKE"
+        run: kubectl apply -f ./deployment/kube/
