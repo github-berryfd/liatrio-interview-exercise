@@ -33,12 +33,12 @@ module "gke" {
   horizontal_pod_autoscaling = true
   node_pools = [
     {
-      name = "liatrio-gke-node-pool"
-      min_count = 1
-      max_count = 2
-      machine_type = "e2-small"
+      name               = "liatrio-gke-node-pool"
+      min_count          = 1
+      max_count          = 2
+      machine_type       = "e2-small"
       initial_node_count = 1
-      disk_size_gb = 10
+      disk_size_gb       = 10
     }
   ]
 
