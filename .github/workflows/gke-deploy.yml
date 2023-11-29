@@ -1,5 +1,5 @@
 # This reusable workflow is designed to deploy the kubernetes manififest files (deployment and service files) to Google Kubernetes Engine (GKE)
-name: Build and Deploy to GKE
+name: Deploy to GKE
 # Specified Required Inputs
 on:
   # This workflow can only be called by another workflow 
@@ -23,11 +23,11 @@ on:
 env:
   GKE_CLUSTER: ${{ inputs.gke_cluster }}   
   GKE_REGION: ${{ inputs.gke_region }}   
-  KUBE_CONTEXT: ${{ inputs.kube-context }}
+  KUBE_CONTEXT: ${{ inputs.kube_context }}
 
 jobs:
-  build-publish:
-    name: Build and Publish Docker Image
+  deploy:
+    name: Deploy to GKE
     runs-on: ubuntu-latest
     environment: production
 
@@ -57,5 +57,5 @@ jobs:
           location: ${{ env.GKE_REGION }}
 
       # Super simple deployment
-      - name: "Deploy to GKE"
+      - name: "Apply Manifest Files"
         run: kubectl apply -f ./deployment/kube/
