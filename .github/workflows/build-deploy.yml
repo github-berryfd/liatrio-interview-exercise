@@ -3,7 +3,7 @@ name: Build and Deploy Workflow
 on:
   push:
     branches: [ "feature-cicd" ]
-
+  
 jobs: 
   terraform:
     name: Call Terraform Workflow
@@ -15,7 +15,13 @@ jobs:
       ip_range_pods: "liatrio-vpc-01-subnet-01-pods"
       ip_range_services: "liatrio-vpc-01-subnet-01-services"
     secrets: inherit 
-  # Coming soon
-  #  deploy: 
-  #   needs: [ standup ]
-  #   uses: ./.github/workflows/gke-deploy.yml
+  build-deploy:
+    needs: [ terraform ] 
+    uses: ./.github/workflows/gke-deploy.yml
+    with:
+      gke_cluster: "liatrio-gke-cluster"
+      gke_region: "us-central1"
+      deployment_name: ""
+      dockerfile_path: "./deployment/dockerfile/Dockerfile"
+      image_tag: "berryfd/berryfd/liatrio-webservice:latest"
+    secrets: inherit
