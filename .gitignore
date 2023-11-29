@@ -10,8 +10,9 @@
 *.out
 
 # Kubernetes
-*.yaml
-*.yml
+!*.yaml
+!*.yml
+
 # Exclude specific YAML configs that should be version controlled
 !*.base.yaml
 !*.base.yml
