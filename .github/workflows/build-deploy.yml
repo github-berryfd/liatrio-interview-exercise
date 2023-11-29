@@ -1,12 +1,21 @@
-name: Build and Deploy
+name: Build and Deploy Workflow
 
 on:
   push:
     branches: [ "feature-cicd" ]
-jobs:
-  standup:
+
+jobs: 
+  terraform:
+    name: Call Terraform Workflow
     uses: ./.github/workflows/terraform.yml
+    with:
+      region: "us-central1"
+      network: "liatrio-vpc"
+      subnetwork: "liatrio-vpc-subnet-"
+      ip_range_pods: "liatrio-vip-subnet-pods"
+      ip_range_services: "liatrio-vip-subnet-services"
     secrets: inherit
-  # deploy:
+  # Coming soon
+  #  deploy: 
   #   needs: [ standup ]
   #   uses: ./.github/workflows/gke-deploy.yml
