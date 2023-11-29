@@ -1,3 +1,4 @@
+gha-creds-*.json
 # Go
 *.exe
 *.exe~
