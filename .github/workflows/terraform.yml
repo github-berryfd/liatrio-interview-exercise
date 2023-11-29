@@ -75,11 +75,11 @@ on:
         type: string
     secrets: 
       GCP_SC_KEY: 
-        required: true
+        required: false
       SERVICE_ACCOUNT:
-        required: true
+        required: false
       GKE_PROJECT_ID:
-        required: true
+        required: false
 
   workflow_dispatch:
     
