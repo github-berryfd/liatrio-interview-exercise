@@ -25,6 +25,11 @@ docker tag liatrio-webservice berryfd/liatrio-webserivce:0.1.0
 kubectl apply -f .\deployment\kube\deployment.yaml
 /health
 
+# Authenticate to gcloud locally (admin)
+gcloud auth application-default login
+# Connecting with Cluster locally (admin)
+gcloud container clusters get-credentials liatrio-gke-cluster --region us-central1
+
 
 CLOUD RESOURCE API
 

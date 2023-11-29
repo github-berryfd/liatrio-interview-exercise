@@ -49,6 +49,7 @@ jobs:
             - name: Build and Publish
               uses: docker/build-push-action@v5
               with:
+                push: true
                 context: .
                 file: ${{ env.DOCKERFILE_PATH }}
                 tags: ${{ env.IMAGE_TAG }}
