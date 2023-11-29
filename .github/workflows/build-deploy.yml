@@ -6,6 +6,7 @@ on:
 jobs:
   standup:
     uses: ./.github/workflows/terraform.yml
+    secrets: inherit
   # deploy:
   #   needs: [ standup ]
   #   uses: ./.github/workflows/gke-deploy.yml
