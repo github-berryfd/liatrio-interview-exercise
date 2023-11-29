@@ -10,10 +10,10 @@ jobs:
     uses: ./.github/workflows/terraform.yml
     with:
       region: "us-central1"
-      network: "liatrio-vpc"
-      subnetwork: "liatrio-vpc-subnet-"
-      ip_range_pods: "liatrio-vip-subnet-pods"
-      ip_range_services: "liatrio-vip-dsubnet-services"
+      network: "liatrio-vpc-01"
+      subnetwork: "liatrio-vpc-01-subnet-01"
+      ip_range_pods: "liatrio-vpc-01-subnet-01-pods"
+      ip_range_services: "liatrio-vpc-01-subnet-01-services"
     secrets: inherit 
   # Coming soon
   #  deploy: 
