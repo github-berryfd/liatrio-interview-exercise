@@ -16,7 +16,7 @@ spec:
         spec:
             containers:
             - name: liatrio-webservice
-              image: berryfd/liatrio-webservice:0.1.0
+              image: berryfd/liatrio-webservice:latest
               imagePullPolicy: IfNotPresent
               ports:
               - containerPort: 8080
@@ -35,6 +35,3 @@ spec:
                   scheme: HTTP
                 initialDelaySeconds: 5
                 timeoutSeconds: 1
-#No resourcse limits --
-#securityContext
-#serviceaccountname (for external requests)

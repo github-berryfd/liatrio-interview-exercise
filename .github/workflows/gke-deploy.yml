@@ -1,18 +1,8 @@
-# This workflow will build a docker container, publish it to Google Container Registry, and deploy it to GKE when there is a push to the "main" branch.
-#
-# To configure this workflow:
-#
-# 1. Ensure that your repository contains the necessary configuration for your Google Kubernetes Engine cluster, including deployment.yml, kustomization.yml, service.yml, etc.
-#
-# 2. Create and configure a Workload Identity Provider for GitHub (https://github.com/google-github-actions/auth#setting-up-workload-identity-federation)
-#
-# 3. Change the values for the GAR_LOCATION, GKE_ZONE, GKE_CLUSTER, IMAGE, REPOSITORY and DEPLOYMENT_NAME environment variables (below).
-#
-# For more support on how to run the workflow, please visit https://github.com/google-github-actions/setup-gcloud/tree/master/example-workflows/gke-kustomize
-
-name: Build and Deploy to GKE
-
+# This reusable workflow is designed to deploy the kubernetes manififest files (deployment and service files) to Google Kubernetes Engine (GKE)
+name: Deploy to GKE
+# Specified Required Inputs
 on:
+  # This workflow can only be called by another workflow 
   workflow_call:
     inputs:
       kube_context:
@@ -26,18 +16,18 @@ on:
         type: string
     secrets:
       PROJECT_ID: 
-        required: false
+        required: false # Even though they actually are required, inheriting the secret doesn't satisfy the 'required: true' and will fail.
       GCP_SA_KEY:
         required: false
-
+# Passing inputs as ENV's for actions.
 env:
   GKE_CLUSTER: ${{ inputs.gke_cluster }}   
   GKE_REGION: ${{ inputs.gke_region }}   
-  KUBE_CONTEXT: ${{ inputs.kube-context }}
+  KUBE_CONTEXT: ${{ inputs.kube_context }}
 
 jobs:
-  build-publish:
-    name: Build and Publish Docker Image
+  deploy:
+    name: Deploy to GKE
     runs-on: ubuntu-latest
     environment: production
 
@@ -51,19 +41,21 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      # Configure Workload Identity Federation and generate an access token.
+      # Configure GCP Authentication with Service Account Credentials. This should be using Workload Identity Federation and generate an access token instead. (MVP)
       - name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v1.2.0'
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
           create_credentials_file: true
           export_environment_variables: true
-
+      
+      # Now that GCP Authentication was successful, we need to authenticate to GKE with GCP credentials so that kubectl will work natively within the container.
       - name: Set up GKE credentials
         uses: google-github-actions/get-gke-credentials@v1
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_REGION }}
 
-      - name: "Deploy to GKE"
+      # Super simple deployment
+      - name: "Apply Manifest Files"
         run: kubectl apply -f ./deployment/kube/

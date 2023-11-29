@@ -1,10 +1,15 @@
+#This is the main entrypoint for the CI/CD
 name: Build and Deploy Workflow
 
+#For our use case, we have one environment that is derrived from 'main', this is the production environment.
 on:
   push:
-    branches: [ "feature-cicd" ]
+    branches: [ "main" ]
   
 jobs: 
+
+  # Stand up the infrastructure and create a Kubernetes cluster, this flow is specific to Google Cloud Provider (GCP)
+  # Terraform seems to fail when it's the first time setting up the infrastructure. Usually around creating vpc's. Just rerun again.
   terraform:
     name: Call Terraform Workflow
     uses: ./.github/workflows/terraform.yml
@@ -14,8 +19,9 @@ jobs:
       subnetwork: "liatrio-vpc-01-subnet-01"
       ip_range_pods: "liatrio-vpc-01-subnet-01-pods"
       ip_range_services: "liatrio-vpc-01-subnet-01-services"
-    secrets: inherit
-   
+    secrets: inherit # Workflows probably shouldn't inherit *all* the secrets. Instead they should be explicit.
+
+  # While Terraforming, we can go ahead and build the image and push it to Docker Hub
   docker-build-publish: 
     name: Call Image Workflow
     uses: ./.github/workflows/docker-publish.yml
@@ -24,6 +30,7 @@ jobs:
       image_tag: "berryfd/liatrio-webservice:latest"
     secrets: inherit
 
+  # Deploy the kubernetes deployment and service file AFTER Terraforming is complete
   deploy:
     needs: [ terraform, docker-build-publish ] 
     name: Call GKE Deployment Workflow

@@ -1,3 +1,4 @@
+# Create the subnetwork within the VPC, there are two IP ranges, one for pods, one for services
 resource "google_compute_subnetwork" "private" {
   name                     = var.subnetwork
   ip_cidr_range            = "10.0.0.0/18"
