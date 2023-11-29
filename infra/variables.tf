@@ -2,6 +2,14 @@ variable "project_id" {
   description = "The project ID to host the cluster in"
 }
 
+variable "cluster_name" {
+  description = "The name of the GKE Cluster that will be created."
+}
+
+variable "node_pool_name" {
+  description = "The name of a Node Pool for GKE"
+}
+
 variable "cluster_name_suffix" {
   description = "A suffix to append to the default cluster name"
   default     = ""
