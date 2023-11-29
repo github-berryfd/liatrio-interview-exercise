@@ -5,7 +5,7 @@ resource "google_compute_subnetwork" "private" {
   region                   = var.region
   network                  = google_compute_network.liatrio-vpc.id
   private_ip_google_access = true
-  depends_on = [ google_compute_network.liatrio-vpc ]
+  depends_on               = [google_compute_network.liatrio-vpc]
   secondary_ip_range {
     range_name    = var.ip_range_pods
     ip_cidr_range = "10.48.0.0/14"

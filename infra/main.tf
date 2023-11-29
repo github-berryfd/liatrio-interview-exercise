@@ -10,7 +10,7 @@ module "gke" {
   source  = "terraform-google-modules/kubernetes-engine/google"
   version = "29.0.0"
 
-  depends_on = [ google_compute_subnetwork.private, google_compute_network.liatrio-vpc ]
+  depends_on = [google_compute_subnetwork.private, google_compute_network.liatrio-vpc]
 
   # This should be used as a variable instead of hard-coded
   name = var.cluster_name
