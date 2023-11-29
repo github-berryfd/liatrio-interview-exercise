@@ -18,7 +18,7 @@ module "gke" {
   project_id = var.project_id
   region     = var.region
 
-  network    = google_compute_network.liatrio-vpc.id
+  network    = var.network
   subnetwork = var.subnetwork
 
   ip_range_pods     = var.ip_range_pods
