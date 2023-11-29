@@ -14,11 +14,13 @@ jobs:
     name: Call Terraform Workflow
     uses: ./.github/workflows/terraform.yml
     with:
+      cluster_name: "liatrio-gke-cluster"
+      node_pool: "liatrio-gke-node-pool"
       region: "us-central1"
       network: "liatrio-vpc-01"
-      subnetwork: "liatrio-vpc-01-subnet-01"
-      ip_range_pods: "liatrio-vpc-01-subnet-01-pods"
-      ip_range_services: "liatrio-vpc-01-subnet-01-services"
+      subnetwork: "liatrio-subnet-01"
+      ip_range_pods: "liatrio-subnet-01-gke-01-pods"
+      ip_range_services: "liatrio-subnet-01-gke-01-services"
     secrets: inherit # Workflows probably shouldn't inherit *all* the secrets. Instead they should be explicit.
 
   # While Terraforming, we can go ahead and build the image and push it to Docker Hub

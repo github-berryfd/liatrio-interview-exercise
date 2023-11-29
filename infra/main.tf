@@ -12,7 +12,7 @@ module "gke" {
 
 
   # This should be used as a variable instead of hard-coded
-  name = "liatrio-gke-cluster"
+  name = var.cluster_name
 
   # Project_ID Is the Google Cloud Project Id
   project_id = var.project_id
@@ -34,7 +34,7 @@ module "gke" {
   node_pools = [
     {
       # This should probably be a variable too.
-      name               = "liatrio-gke-node-pool"
+      name               = var.node_pool_name
       min_count          = 1
       max_count          = 2
       machine_type       = "e2-small"
