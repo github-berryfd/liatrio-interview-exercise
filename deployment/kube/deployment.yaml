@@ -17,7 +17,7 @@ spec:
             containers:
             - name: liatrio-webservice
               image: berryfd/liatrio-webservice:latest
-              imagePullPolicy: IfNotPresent
+              imagePullPolicy: Always
               ports:
               - containerPort: 8080
               livenessProbe:
