@@ -14,6 +14,9 @@ on:
       gke_region:
         required: true
         type: string
+      deployment_name:
+        required: true
+        type: string
     secrets:
       PROJECT_ID: 
         required: false # Even though they actually are required, inheriting the secret doesn't satisfy the 'required: true' and will fail.
@@ -24,6 +27,7 @@ env:
   GKE_CLUSTER: ${{ inputs.gke_cluster }}   
   GKE_REGION: ${{ inputs.gke_region }}   
   KUBE_CONTEXT: ${{ inputs.kube_context }}
+  DEPLOYMENT_NAME: ${{ inputs.deployment_name }}
 
 jobs:
   deploy:
@@ -59,6 +63,7 @@ jobs:
       # Super simple deployment
       - name: "Apply Manifest Files"
         run: kubectl apply -f ./deployment/kube/
-
+      - name: "Triggering Deployment Update"
+        run: kubectl patch deployment $DEPLOYMENT_NAME -p \"{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}
       - name: "Rolling Deploy"
-        run: kubectl rollout restart deployment liatrio-exercise
+        run: kubectl rollout restart deployment 
