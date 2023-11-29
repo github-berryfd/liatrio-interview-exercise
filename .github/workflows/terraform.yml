@@ -41,11 +41,46 @@
 #       uses: hashicorp/setup-terraform@v1
 #       with:
 #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+# TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
+# TF_VAR_region: ${{ vars.REGION }}
+# TF_VAR_network: ${{ vars.NETWORK }}
+# TF_VAR_subnetwork: ${{ vars.SUBNETWORK }}
+# TF_VAR_ip_range_pods: ${{ vars.IP_RANGE_PODS }}
+# TF_VAR_ip_range_services: ${{ vars.IP_RANGE_SERVICES }}
+# TF_VAR_compute_engine_service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
 name: 'Setting Up Infrastructure'
 
 on:
   workflow_call:
+    inputs:
+      region:
+        required: true
+        type: string
+      network:
+        required: false
+        default: 'terraformed-vpc-01'
+        type: string
+      subnetwork:
+        required: false
+        default: 'terraformed-vpc-01-subnet-01'
+        type: string
+      ip_range_pods:
+        default: 'terraformed-vpc-01-subnet-01-pods'
+        required: false
+        type: string
+      ip_range_services:
+        default: 'terraformed-vpc-01-subnet-01-services'
+        required: false
+        type: string
+    secrets: 
+      GCP_SC_KEY: 
+        required: true
+      SERVICE_ACCOUNT:
+        required: true
+      GKE_PROJECT_ID:
+        required: true
+
   workflow_dispatch:
     
 
@@ -57,8 +92,15 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: production
-
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    env:
+      TF_VAR_region: ${{ inputs.region }}
+      TF_VAR_network: ${{ inputs.network }}
+      TF_VAR_subnetwork: ${{ inputs.subnetwork }}
+      TF_VAR_ip_range_pods: ${{ inputs.ip_range_pods }}
+      TF_VAR_ip_range_services: ${{ inputs.IP_RANGE_SERVICES }}
+      TF_VAR_compute_engine_service_account: ${{ secrets.SERVICE_ACCOUNT}}
+      TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
+      # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
@@ -70,6 +112,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{ github.ref }}
+
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Authenticate With GCP
       uses: google-github-actions/auth@v1.2.0
@@ -77,23 +120,15 @@ jobs:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
         create_credentials_file: true
         export_environment_variables: true
-
+      
     - name: Setup Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
-
+      
   # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: "1.6.4"
-      env:
-        TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
-        TF_VAR_region: ${{ env.REGION }}
-        TF_VAR_network: ${{ env.NETWORK }}
-        TF_VAR_subnetwork: ${{ env.SUBNETWORK }}
-        TF_VAR_ip_range_pods: ${{ env.IP_RANGE_PODS }}
-        TF_VAR_ip_range_services: ${{ env.IP_RANGE_SERVICES }}
-        TF_VAR_compute_engine_service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
@@ -102,7 +137,7 @@ jobs:
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       run: terraform fmt -check
-
+    # Save plan
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       run: terraform plan -input=false
