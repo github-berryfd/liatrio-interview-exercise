@@ -72,7 +72,7 @@ jobs:
     - name: Authenticate With GCP
       uses: google-github-actions/auth@v1.2.0
       with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
         create_credentials_file: true
         export_environment_variables: true
 
