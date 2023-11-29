@@ -24,31 +24,20 @@ on:
       deployment_name:
         required: true
         type: string
-      dockerfile_path:
-        required: true
-        type: string
-      image_tag:
-        required: true
-        type: string
     secrets:
       PROJECT_ID: 
         required: false
       GCP_SA_KEY:
-        required: false
-      DOCKER_USERNAME:
-        required: false
-      DOCKER_AUTH_TOKEN:
         required: false
 
 env:
   GKE_CLUSTER: ${{ inputs.gke_cluster }}   
   GKE_REGION: ${{ inputs.gke_region }}   
   DEPLOYMENT_NAME: ${{ inputs.deployment_name }} 
-  DOCKERFILE_PATH: ${{ inputs.dockerfile_path }}
-  IMAGE_TAG: ${{ inputs.image_tag }}
+
 jobs:
-  setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
+  build-publish:
+    name: Build and Publish Docker Image
     runs-on: ubuntu-latest
     environment: production
 
@@ -70,31 +59,12 @@ jobs:
           create_credentials_file: true
           export_environment_variables: true
 
-      # - name: Set up GKE credentials
-      #   uses: google-github-actions/get-gke-credentials@v1
-      #   with:
-      #     cluster_name: ${{ env.GKE_CLUSTER }}
-      #     location: ${{ env.GKE_REGION }}
+      - name: Set up GKE credentials
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_REGION }}
       
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          buildkitd-flags: --debug
-
-      - name: Login to Docker
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_AUTH_TOKEN }}
-
-      # Build the Docker image
-      - name: Build and Publish
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ${{ env.DOCKERFILE_PATH }}
-          tags: ${{ env.IMAGE_TAG }}
-
 
       # # Push the Docker image to Google Artifact Registry
       # - name: Publish
