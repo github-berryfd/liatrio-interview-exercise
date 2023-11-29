@@ -42,4 +42,5 @@ jobs:
       kube_context: "./deployment/kube/"
       gke_cluster: "liatrio-gke-cluster"
       gke_region: "us-central1"
+      deployment_name: "liatrio-exercise"
     
