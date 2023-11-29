@@ -30,6 +30,3 @@ variable "ip_range_services" {
 variable "compute_engine_service_account" {
   description = "Service account to associate to the nodes in the cluster"
 }
-variable "gcp-credentials" {
-  description = "The Google Cloud Provider credentials for the service account"
-}

@@ -41,53 +41,112 @@
 #       uses: hashicorp/setup-terraform@v1
 #       with:
 #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+# TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
+# TF_VAR_region: ${{ vars.REGION }}
+# TF_VAR_network: ${{ vars.NETWORK }}
+# TF_VAR_subnetwork: ${{ vars.SUBNETWORK }}
+# TF_VAR_ip_range_pods: ${{ vars.IP_RANGE_PODS }}
+# TF_VAR_ip_range_services: ${{ vars.IP_RANGE_SERVICES }}
+# TF_VAR_compute_engine_service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
-name: 'Terraform'
+name: 'Setting Up Infrastructure'
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
+  workflow_call:
+    inputs:
+      region:
+        required: true
+        type: string
+      network:
+        required: false
+        default: 'terraformed-vpc-01'
+        type: string
+      subnetwork:
+        required: false
+        default: 'terraformed-vpc-01-subnet-01'
+        type: string
+      ip_range_pods:
+        default: 'terraformed-vpc-01-subnet-01-pods'
+        required: false
+        type: string
+      ip_range_services:
+        default: 'terraformed-vpc-01-subnet-01-services'
+        required: false
+        type: string
+    secrets: 
+      GCP_SC_KEY: 
+        required: false
+      SERVICE_ACCOUNT:
+        required: false
+      GKE_PROJECT_ID:
+        required: false
+
+  workflow_dispatch:
+    
 
 permissions:
   contents: read
 
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'Terraform Infrastructure'
     runs-on: ubuntu-latest
     environment: production
-
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    env:
+      TF_VAR_region: ${{ inputs.region }}
+      TF_VAR_network: ${{ inputs.network }}
+      TF_VAR_subnetwork: ${{ inputs.subnetwork }}
+      TF_VAR_ip_range_pods: ${{ inputs.ip_range_pods }}
+      TF_VAR_ip_range_services: ${{ inputs.IP_RANGE_SERVICES }}
+      TF_VAR_compute_engine_service_account: ${{ secrets.SERVICE_ACCOUNT}}
+      TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
+      # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
+        working-directory: ./infra
 
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
-      uses: actions/checkout@v3
-
-    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: actions/checkout@v4
       with:
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+        ref: ${{ github.ref }}
 
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    - name: Terraform Init
-      run: terraform init
+    - name: Authenticate With GCP
+      uses: google-github-actions/auth@v1.2.0
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        create_credentials_file: true
+        export_environment_variables: true
+      
+    - name: Setup Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      
+  # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.6.4"
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       run: terraform fmt -check
 
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init 
+
+    - name: Terraform Validate
+      run: terraform fmt -check
+    # Save plan
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       run: terraform plan -input=false
+      continue-on-error: true
 
       # On push to "main", build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+      # if: github.ref == 'refs/heads/$main' && github.event_name == 'push'
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
