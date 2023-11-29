@@ -14,14 +14,22 @@ jobs:
       subnetwork: "liatrio-vpc-01-subnet-01"
       ip_range_pods: "liatrio-vpc-01-subnet-01-pods"
       ip_range_services: "liatrio-vpc-01-subnet-01-services"
-    secrets: inherit 
-  build-deploy:
-    needs: [ terraform ] 
+    secrets: inherit
+   
+  docker-build-publish: 
+    name: Call Image Workflow
+    uses: ./.github/workflows/docker-publish.yml
+    with:
+      dockerfile_path: "./deployment/docker/Dockerfile"
+      image_tag: "berryfd/berryfd/liatrio-webservice:latest"
+    secrets: inherit
+
+  deploy:
+    needs: [ terraform, docker-build-publish ] 
+    name: Call GKE Deployment Workflow
     uses: ./.github/workflows/gke-deploy.yml
     with:
       gke_cluster: "liatrio-gke-cluster"
       gke_region: "us-central1"
       deployment_name: ""
-      dockerfile_path: "./deployment/docker/Dockerfile"
-      image_tag: "berryfd/berryfd/liatrio-webservice:latest"
     secrets: inherit
