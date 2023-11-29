@@ -60,10 +60,13 @@ jobs:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_REGION }}
 
-      # Super simple deployment
+      # Update Manifest Files
       - name: "Apply Manifest Files"
         run: kubectl apply -f ./deployment/kube/
+
+      # Update meta data so rolling deploy will work
       - name: "Triggering Deployment Update"
-        run: kubectl patch deployment $DEPLOYMENT_NAME -p \"{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}
+        run: kubectl patch deployment $DEPLOYMENT_NAME -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+      
       - name: "Rolling Deploy"
         run: kubectl rollout restart deployment 
