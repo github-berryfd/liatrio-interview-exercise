@@ -6,6 +6,6 @@ on:
 jobs:
   standup:
     uses: ./.github/workflows/terraform.yml
-  deploy:
-    needs: [ standup ]
-    uses: ./.github/workflows/google.yml
+  # deploy:
+  #   needs: [ standup ]
+  #   uses: ./.github/workflows/gke-deploy.yml

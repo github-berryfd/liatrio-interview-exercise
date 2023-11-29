@@ -42,7 +42,7 @@
 #       with:
 #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-name: 'Terraform'
+name: 'Setting Up Infrastructure'
 
 on:
   workflow_call:
@@ -69,10 +69,25 @@ jobs:
       uses: actions/checkout@v3
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+
+    - name: Setup Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        project_id: ${{ secrets.GKE_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+  # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
-      with:
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      env:
+        TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
+        TF_VAR_region: ${{ env.REGION }}
+        TF_VAR_network: ${{ env.NETWORK }}
+        TF_VAR_subnetwork: ${{ env.SUBNETWORK }}
+        TF_VAR_ip_range_pods: ${{ env.IP_RANGE_PODS }}
+        TF_VAR_ip_range_services: ${{ env.IP_RANGE_SERVICES }}
+        TF_VAR_compute_engine_service_account: ${{ env.SERVICE_ACCOUNT }}
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init

@@ -1,6 +1,5 @@
 
 provider "google" {
-  credentials = file(var.gcp-credentials)
   project     = var.project_id
   region      = var.region
 }
