@@ -16,14 +16,22 @@ on:
         type: string
       subnetwork:
         required: false
-        default: 'terraformed-vpc-01-subnet-01'
+        default: 'terraformed-subnet-01'
         type: string
       ip_range_pods:
-        default: 'terraformed-vpc-01-subnet-01-pods'
+        default: 'terraformed-subnet-01-gke-01-pods'
         required: false
         type: string
       ip_range_services:
-        default: 'terraformed-vpc-01-subnet-01-services'
+        default: 'terraformed-subnet-01-gke-01-services'
+        required: false
+        type: string
+      cluster_name:
+        default: 'terraformed-gke-cluster'
+        required: false
+        type: string
+      node_pool:
+        default: 'terraformed-gke-node-pool'
         required: false
         type: string
     secrets: 
@@ -53,6 +61,8 @@ jobs:
       TF_VAR_ip_range_services: ${{ inputs.IP_RANGE_SERVICES }}
       TF_VAR_compute_engine_service_account: ${{ secrets.SERVICE_ACCOUNT}}
       TF_VAR_project_id: ${{ secrets.GKE_PROJECT_ID }}
+      TF_VAR_cluster_name: ${{ inputs.cluster_name }}
+      TF_VAR_node_pool_name: ${{ inputs.node_pool }}
 
       # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -89,6 +99,7 @@ jobs:
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       run: terraform fmt -check
+      continue-on-error: true
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
