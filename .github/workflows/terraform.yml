@@ -77,7 +77,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{ github.ref }}
-
+      
     # Configure GCP Authentication with Service Account Credentials. This should be using Workload Identity Federation and generate an access token instead. (MVP)
     - name: Authenticate With GCP
       uses: google-github-actions/auth@v1.2.0
@@ -89,7 +89,20 @@ jobs:
     # Configure the SDK so that we can use terraform natively
     - name: Setup Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
-      
+    
+    # Setup python
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        cache: 'pip'
+    # Setup terraform
+    - name: Setup Checkov
+      run: pip3 install checkov
+
+      #Analzyse Terraform
+    - name: Analyze Terraform Configuration
+      run: checkov --directory . 
+
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3

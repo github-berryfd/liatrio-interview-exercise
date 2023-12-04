@@ -33,5 +33,8 @@ gcloud container clusters get-credentials liatrio-gke-cluster --region us-centra
 
 CLOUD RESOURCE API
 
+TESTING
+go test
+
 
 Git push -> Git workflow -> (C: Terraform VPC) -> (C: Terraform GKE (module))  -> (C: Artifactroy upload and deploy)
