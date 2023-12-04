@@ -1,21 +1,6 @@
 # Required by GKE
 data "google_client_config" "provider" {}
 
-resource "google_storage_bucket" "default" {
-  name                        = "liatrio-tf-state"
-  location                    = "US"
-  force_destroy               = false
-  storage_class               = "STANDARD"
-  uniform_bucket_level_access = true
-  public_access_prevention    = "enforced"
-  versioning {
-    enabled = true
-  }
-  logging {
-    log_bucket = "tf-state-log"
-  }
-}
-
 # This module is designed to set up the GKE Engine *after* the infrastructure has been set up.
 # We could of used another module to build the project with the roles, but I felt that was out of scope for this. 
 # See: https://github.com/terraform-google-modules/terraform-google-project-factory/tree/master 
