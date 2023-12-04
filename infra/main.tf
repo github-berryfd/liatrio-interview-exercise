@@ -7,7 +7,7 @@ data "google_client_config" "provider" {}
 # See: https://github.com/terraform-google-modules/terraform-google-project-factory/tree/master 
 
 module "gke" {
-  source  = "terraform-google-modules/kubernetes-engine/google"
+  source  = "git::https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git?ref=b6f35606ab373d5f572ff873569aeee5e5bf7f32"
   version = "29.0.0"
 
   depends_on = [google_compute_subnetwork.private, google_compute_network.liatrio-vpc]
