@@ -1,6 +1,22 @@
 # Required by GKE
 data "google_client_config" "provider" {}
 
+resource "google_storage_bucket" "default" {
+  name = "liatrio-tf-state"
+  location      = "US"
+  force_destroy = false
+  storage_class = "STANDARD"
+  versioning {
+    enabled = true
+  }
+  encryption {
+    default_kms_key_name = google_kms_crypto_key.terraform_state_bucket.id
+  }
+  depends_on = [
+    google_project_iam_member.default
+  ]
+}
+
 
 # This module is designed to set up the GKE Engine *after* the infrastructure has been set up.
 # We could of used another module to build the project with the roles, but I felt that was out of scope for this. 
@@ -34,10 +50,9 @@ module "gke" {
   horizontal_pod_autoscaling = true
   node_pools = [
     {
-      # This should probably be a variable too.
       name               = var.node_pool_name
       min_count          = 1
-      max_count          = 2
+      max_count          = 3
       machine_type       = "e2-small"
       initial_node_count = 1
       disk_size_gb       = 10
