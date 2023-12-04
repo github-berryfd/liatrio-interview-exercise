@@ -2,12 +2,12 @@
 data "google_client_config" "provider" {}
 
 resource "google_storage_bucket" "default" {
-  name = "liatrio-tf-state"
-  location      = "US"
-  force_destroy = false
-  storage_class = "STANDARD"
+  name                        = "liatrio-tf-state"
+  location                    = "US"
+  force_destroy               = false
+  storage_class               = "STANDARD"
   uniform_bucket_level_access = true
-  public_access_prevention = "enforced"
+  public_access_prevention    = "enforced"
   versioning {
     enabled = true
   }
