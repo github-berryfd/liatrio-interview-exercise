@@ -6,7 +6,7 @@ resource "google_compute_subnetwork" "private" {
   network                    = google_compute_network.liatrio-vpc.id
   private_ip_google_access   = true
   depends_on                 = [google_compute_network.liatrio-vpc]
-  private_ipv6_google_access = "ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE"
+  private_ipv6_google_access = "ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE"
   log_config {
     aggregation_interval = "INTERVAL_5_SEC"
     flow_sampling        = 0.5
