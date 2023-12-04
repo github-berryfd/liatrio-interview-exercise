@@ -6,17 +6,15 @@ resource "google_storage_bucket" "default" {
   location      = "US"
   force_destroy = false
   storage_class = "STANDARD"
+  uniform_bucket_level_access = true
+  public_access_prevention = "enforced"
   versioning {
     enabled = true
   }
-  encryption {
-    default_kms_key_name = google_kms_crypto_key.terraform_state_bucket.id
+  logging {
+    log_bucket = "tf-state-log"
   }
-  depends_on = [
-    google_project_iam_member.default
-  ]
 }
-
 
 # This module is designed to set up the GKE Engine *after* the infrastructure has been set up.
 # We could of used another module to build the project with the roles, but I felt that was out of scope for this. 
