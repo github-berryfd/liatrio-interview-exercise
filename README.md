@@ -144,7 +144,7 @@ The pipeline consists of several stages:
 
 ## What's Running
 After the pipeline is finished you will be left with a functioning Kubernetes Cluster running on Google Cloud Provider.
-The infrastrucutre is set up as such:
+The infrastructure is set up as such:
 - A VPC network called `liatrio-vpc-01`
 - A Subnetwork with two IP Ranges called `liatrio-subnet-01`
     - An IP Range for pods called `liatrio-subnet-01-gke-01-pods`
