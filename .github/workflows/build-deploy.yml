@@ -9,7 +9,6 @@ on:
 jobs: 
 
   # Stand up the infrastructure and create a Kubernetes cluster, this flow is specific to Google Cloud Provider (GCP)
-  # Terraform seems to fail when it's the first time setting up the infrastructure. Usually around creating vpc's. Just rerun again.
   terraform:
     name: Call Terraform Workflow
     uses: ./.github/workflows/terraform.yml
