@@ -17,7 +17,7 @@ func GetHealthStatus() httprouter.Handle {
 	//When the endpoint is reached, this function will be called with the following parameters.
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		response := HealthStatus{
-			Message:   "Automate all the things x5!",
+			Message:   "Automate all the things x6!",
 			Timestamp: time.Now().UnixMilli(),
 		}
 
