@@ -1,6 +1,6 @@
 FROM golang:latest as builder
 
-LABEL maintainer="Daniel"
+LABEL maintainer="Daniel Berry <github@berryfd.net>"
 
 WORKDIR /opt/build-go-app
 

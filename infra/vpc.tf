@@ -16,7 +16,7 @@ resource "google_compute_network" "liatrio-vpc" {
   name                            = var.network
   routing_mode                    = "REGIONAL" #OR GLOBAL
   auto_create_subnetworks         = false
-  mtu                             = 1460
+  mtu                             = 1460 # For GCP
   delete_default_routes_on_create = false
   depends_on                      = [google_project_service.compute, google_project_service.container]
 }
